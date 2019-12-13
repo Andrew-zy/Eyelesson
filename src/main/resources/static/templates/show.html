@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="../js/jquery-3.3.1.min.js"></script>
+</head>
+<script type="text/javascript">
+    window.onload = function () {
+        show()
+    }
+
+    function add() {
+        var bookid = $("#bookid").val()
+        var bookName = $("#bookName").val()
+        var author = $("#author").val()
+        var bookTime = $("#bookTime").val()
+        var bookPrice = $("#bookPrice").val()
+        $.ajax({
+            type: "post",
+            url: "/add",
+            data: {
+                "bookid": null,
+                "bookName": bookName,
+                "author": author,
+                "bookTime": bookTime,
+                "bookPrice": bookPrice,
+                "bookPrice": bookPrice
+            },
+            success: function (data) {
+                if (data == 1) {
+                    alert("添加成功")
+                }
+                show();
+            },
+            error: function () {
+                alert("出错");
+            },
+            jsonType: "JSON"
+        })
+    }
+
+    function addshow() {
+        $("#addupshow").show()
+    }
+
+    function show() {
+        $("#tbody").empty();
+        $("#addupshow").hide();
+        $.ajax({
+            type: "post",
+            url: "/com/show",
+            success: function (data) {
+                console.log(data)
+                for (var i = 0; i < data.length; i++) {
+                    var tr = "<tr>"
+                    tr += "<td>" + data[i].bookid + "</td>"
+                    tr += "<td>" + data[i].bookName + "</td>"
+                    tr += "<td>" + data[i].author + "</td>"
+                    tr += "<td>" + data[i].bookTime + "</td>"
+                    tr += "<td>" + data[i].bookPrice + "</td>"
+                    tr += "<td><button onclick='del(" + data[i].bookid + ")'>删除</button>" + "|" + "<button onclick='upshow(" + data.bookid + ")'>修改</button>" + "</td>"
+                    tr += "</tr>"
+                    $("#tbody").append(tr);
+                }
+                var tr = "<tr>"
+                tr += "<td><button onclick='addshow()'>添加</button>" + "</td>"
+                tr += "</tr>"
+                $("#tbody").append(tr);
+
+            },
+            error: function () {
+                alert("出错");
+            }
+        })
+    }
+</script>
+<body>
+<table align="center" border="1px">
+    <th>编号</th>
+    <th>名称</th>
+    <th>作者</th>
+    <th>出版日期</th>
+    <th>价格</th>
+    <tbody id="tbody"></tbody>
+</table>
+<div id="addupshow">
+    <table align="center" border="1px">
+        <input type="hidden" id="bookid" name="bookid">
+        <tr>
+            <td>名称</td>
+            <td><input type="text" id="bookName" name="bookName"></td>
+        </tr>
+        <tr>
+            <td>作者</td>
+            <td><input type="text" id="author" name="author"></td>
+        </tr>
+        <tr>
+            <td>出版日期</td>
+            <td><input type="text" id="bookTime" name="bookTime"></td>
+        </tr>
+        <tr>
+            <td>价格</td>
+            <td><input type="text" id="bookPrice" name="bookPrice"></td>
+        </tr>
+        <tr>
+            <td><input type="button" id="btn" value="添加" onclick="add()"></td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

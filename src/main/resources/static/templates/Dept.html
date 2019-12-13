@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="../easyui/jquery.min.js"></script>
+    <script type="text/javascript" src="../easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../easyui/locale/easyui-lang-zh_CN.js"></script>
+    <link type="text/css" href="../easyui/themes/default/easyui.css" rel="stylesheet"/>
+    <link type="text/css" href="../easyui/themes/icon.css" rel="stylesheet"/>
+</head>
+
+<script type="text/javascript">
+    // 定义变量
+    var fmurl;
+
+    // 显示窗口
+    function showDialog(method) {
+
+        // 重置
+        $("#fm").form().form("reset");
+        if (method == "add") {
+            fmurl = "/dept/add";
+            // 显示窗口
+            $("#dl").dialog().dialog("open").dialog("setTitle", "新增");
+        } else if (method = "edit") {
+            var row = $("#dg").datagrid('getSelected');
+
+            if (row != null) {
+                // 重置
+                $('#fm').form('reset');
+                // 属性名和表单的name名
+                $('#fm').form('load', row);
+                // 显示窗口
+                $("#dl").dialog().dialog("open").dialog("setTitle", '修改');
+                fmurl = "/dept/upd";
+            } else {
+                $.messager.alert("提示", "请选择要修改的数据");
+            }
+        }
+    }
+
+    // 添加
+    function submits() {
+        $("#fm").form({
+            url: fmurl,
+            success: function () {
+                // 提示信息
+                $.messager.show({
+                    title: '提示',
+                    msg: "操作成功！"
+                });
+                // 关闭添加窗口
+                $("#dl").dialog().dialog("close");
+                // 刷新表格
+                $("#dg").datagrid('reload');
+            }
+        });
+
+        // form(),将当前对象作为easyui的fotm表单
+        $("#fm").form().submit();
+    }
+
+    // 删除
+    function deletes() {
+        var row = $("#dg").datagrid('getSelected');
+        if (row != null) {
+            $.post("/dept/del", {deptId: row.deptId}, function (data) {
+                if (data == 1) {
+                    $.messager.show({
+                        title: "提示",
+                        msg: "删除成功"
+                    });
+                    $("#dg").datagrid("reload");
+                } else {
+                    $.messager.show({
+                        title: "提示",
+                        msg: "删除失败"
+                    });
+                }
+            });
+        } else {
+            $.messager.alert("提示", "请选择要删除的数据");
+        }
+    }
+</script>
+
+<body>
+
+<table id="dg" class="easyui-datagrid" align="center" style="width:100%;height: 100%"
+       url="/dept/selectAllPage" data-options="fitColumns:true,toolbar:'#tb',singleSelect:true,pagination:true">
+    <thead>
+    <tr>
+        <th data-options="field:'deptId',width:100">编号</th>
+        <th data-options="field:'deptName',width:100">名称</th>
+    </tr>
+    </thead>
+</table>
+
+<div id="tb">
+    <a class="easyui-linkbutton" href="javascript:showDialog('add')" data-options="iconCls:'icon-add'">添加</a>
+    <a class="easyui-linkbutton" href="javascript:showDialog('edit')" data-options="iconCls:'icon-edit'">修改</a>
+    <a class="easyui-linkbutton" href="javascript:deletes()" data-options="iconCls:'icon-remove'">删除</a>
+</div>
+
+<div id="dl" class="easyui-dialog" style="width:100%;max-width:400px;padding:30px 60px;"
+     data-options="modal:true,draggable:false,minimizable:true,maximizable:true,closed:true">
+    <form id="fm" method="post">
+        <div style="margin-bottom:20px" hidden>
+            <input class="easyui-textbox" name="deptId" style="width:100%"
+                   data-options="label:'编号:'">
+        </div>
+        <div style="margin-bottom:20px">
+            <input class="easyui-textbox" name="deptName" style="width:100%"
+                   data-options="label:'名称:',required:true">
+        </div>
+        <div style="margin-bottom:20px">
+            <a class="easyui-linkbutton" href="javascript:submits()" data-options="iconCls:'icon-ok'">提交</a>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>
